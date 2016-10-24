@@ -1,7 +1,7 @@
 #import re
 from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
-db = client['Washington_tweets']
+db = client['Texas_tweets']
 collection = db['twitter_collection']
 tweets_iterator = collection.find()
 tweets = []
@@ -19,3 +19,4 @@ print(len(tweets))
 #retweet_count = tweet['retweeted_status']['retweet_count']
 #retweeted_name = tweet['retweeted_status']['user']['name']
 #retweeted_screen_name = tweet['retweeted_status']['user']['screen_name']
+./mongoexport --host localhost --db Texas_tweets --collection twitter_collection --csv > test4.csv --fields id, user 
