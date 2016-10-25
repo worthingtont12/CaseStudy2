@@ -42,6 +42,8 @@ seattle.text.clean = tm_map(seattle.text.clean, removeNumbers)                  
 seattle.text.clean = tm_map(seattle.text.clean, removePunctuation)                  # remove punctuation
 seattle.text.clean = tm_map(seattle.text.clean, content_transformer(tolower))       # ignore case
 seattle.text.clean = tm_map(seattle.text.clean, removeWords, stopwords("english"))  # remove stop words
+seattle.text.clean = tm_map(seattle.text.clean, stemDocument, lazy = TRUE)                       # stem all words
+seattle.text.clean.tf = DocumentTermMatrix(seattle.text.clean, control = list(weighting = weightTf))
 
 # clean Washington.Other data
 washington.other.text <- VCorpus(DataframeSource(as.data.frame(washington.other$author.text)))
@@ -50,6 +52,8 @@ washington.other.text.clean = tm_map(washington.other.text.clean, removeNumbers)
 washington.other.text.clean = tm_map(washington.other.text.clean, removePunctuation)                  # remove punctuation
 washington.other.text.clean = tm_map(washington.other.text.clean, content_transformer(tolower))       # ignore case
 washington.other.text.clean = tm_map(washington.other.text.clean, removeWords, stopwords("english"))  # remove stop words
+washington.other.text.clean = tm_map(washington.other.text.clean, stemDocument, lazy = TRUE)          # stem all words
+washington.other.text.clean.tf = DocumentTermMatrix(washington.other.text.clean, control = list(weighting = weightTf))
 
 # clean Houston data
 houston.text <- VCorpus(DataframeSource(as.data.frame(houston$author.text)))
@@ -58,6 +62,8 @@ houston.text.clean = tm_map(houston.text.clean, removeNumbers)                  
 houston.text.clean = tm_map(houston.text.clean, removePunctuation)                  # remove punctuation
 houston.text.clean = tm_map(houston.text.clean, content_transformer(tolower))       # ignore case
 houston.text.clean = tm_map(houston.text.clean, removeWords, stopwords("english"))  # remove stop words
+houston.text.clean = tm_map(houston.text.clean, stemDocument, lazy = TRUE)          # stem all words
+houston.text.clean.tf = DocumentTermMatrix(houston.text.clean, control = list(weighting = weightTf))
 
 # clean Austin data
 austin.text <- VCorpus(DataframeSource(as.data.frame(austin$author.text)))
@@ -66,6 +72,8 @@ austin.text.clean = tm_map(austin.text.clean, removeNumbers)                    
 austin.text.clean = tm_map(austin.text.clean, removePunctuation)                  # remove punctuation
 austin.text.clean = tm_map(austin.text.clean, content_transformer(tolower))       # ignore case
 austin.text.clean = tm_map(austin.text.clean, removeWords, stopwords("english"))  # remove stop words
+austin.text.clean = tm_map(austin.text.clean, stemDocument, lazy = TRUE)          # stem all words
+austin.text.clean.tf = DocumentTermMatrix(austin.text.clean, control = list(weighting = weightTf))
 
 # clean Dallas data
 dallas.text <- VCorpus(DataframeSource(as.data.frame(dallas$author.text)))
@@ -74,6 +82,8 @@ dallas.text.clean = tm_map(dallas.text.clean, removeNumbers)                    
 dallas.text.clean = tm_map(dallas.text.clean, removePunctuation)                  # remove punctuation
 dallas.text.clean = tm_map(dallas.text.clean, content_transformer(tolower))       # ignore case
 dallas.text.clean = tm_map(dallas.text.clean, removeWords, stopwords("english"))  # remove stop words
+dallas.text.clean = tm_map(dallas.text.clean, stemDocument, lazy = TRUE)          # stem all words
+dallas.text.clean.tf = DocumentTermMatrix(dallas.text.clean, control = list(weighting = weightTf))
 
 # clean Texas.Other data
 texas.other.text <- VCorpus(DataframeSource(as.data.frame(texas.other$author.text)))
@@ -82,9 +92,5 @@ texas.other.text.clean = tm_map(texas.other.text.clean, removeNumbers)          
 texas.other.text.clean = tm_map(texas.other.text.clean, removePunctuation)                  # remove punctuation
 texas.other.text.clean = tm_map(texas.other.text.clean, content_transformer(tolower))       # ignore case
 texas.other.text.clean = tm_map(texas.other.text.clean, removeWords, stopwords("english"))  # remove stop words
-
-seattle.text.clean[[2]]$content
-
-seattle.text.clean = tm_map(seattle.text.clean, stemDocument)                       # stem all words
-seattle.text.clean.tf = DocumentTermMatrix(seattle.text.clean, control = list(weighting = weightTf))
-
+texas.other.text.clean = tm_map(texas.other.text.clean, stemDocument, lazy = TRUE)          # stem all words
+texas.other.text.clean.tf = DocumentTermMatrix(texas.other.text.clean, control = list(weighting = weightTf))
