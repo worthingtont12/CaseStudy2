@@ -1,5 +1,19 @@
-washington <- read.csv('Washington_tweets.csv')
-texas <- read.csv('Texas_tweets.csv')
+washington <- read.csv('Washington_cleaned.csv')
+texas <- read.csv('Texas_cleaned.csv')
+texas <- texas[-2]
+texas <- texas[-3]
+texas <- texas[-3]
+texas <- texas[-6]
+texas <- texas[-6]
+texas <- texas[-1]
+texas <- unique(texas)
+washington <- washington[-2]
+washington <- washington[-3]
+washington <- washington[-3]
+washington <- washington[-6]
+washington <- washington[-6]
+washington <- washington[-1]
+washington <- unique(washington)
 
 seattle <- washington[grepl('seattle', washington$user.location, ignore.case = TRUE),]
 washington.other <- washington[!grepl('seattle', washington$user.location, ignore.case = TRUE) & 
