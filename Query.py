@@ -19,4 +19,4 @@ print(len(tweets))
 #retweet_count = tweet['retweeted_status']['retweet_count']
 #retweeted_name = tweet['retweeted_status']['user']['name']
 #retweeted_screen_name = tweet['retweeted_status']['user']['screen_name']
-./mongoexport --host localhost --db Texas_tweets --collection twitter_collection --csv > test4.csv --fields id, user 
+#./mongoexport --host localhost --db Washington_tweets --collection twitter_collection --csv > Washington_tweets.csv --fields id,user.id,text,lang,user.lang,user.location,user.screen_name,coordinates
