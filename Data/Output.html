@@ -120,350 +120,198 @@ $(document).ready(function () {
 <h4 class="date"><em>Wed Oct 26 00:35:57 2016</em></h4>
 
 </div>
-
-
-<pre class="r"><code>washington &lt;- read.csv('Washington_cleaned.csv')
-texas &lt;- read.csv('Texas_cleaned.csv')
-texas &lt;- texas[-2]
-texas &lt;- texas[-3]
-texas &lt;- texas[-3]
-texas &lt;- texas[-6]
-texas &lt;- texas[-6]
-texas &lt;- texas[-1]
-texas &lt;- unique(texas)
-washington &lt;- washington[-2]
-washington &lt;- washington[-3]
-washington &lt;- washington[-3]
-washington &lt;- washington[-6]
-washington &lt;- washington[-6]
-washington &lt;- washington[-1]
-washington &lt;- unique(washington)
-
-seattle &lt;- washington[grepl('seattle', washington$user.location, ignore.case = TRUE),]
-washington.other &lt;- washington[!grepl('seattle', washington$user.location, ignore.case = TRUE) &amp; 
-                             (grepl('WA', washington$user.location) | 
-                                grepl('washington', washington$user.location, ignore.case = TRUE)), ]
-
-austin &lt;- texas[grepl('austin', texas$user.location, ignore.case = TRUE),]
-dallas &lt;- texas[grepl('dallas', texas$user.location, ignore.case = TRUE),]
-houston &lt;- texas[grepl('houston', texas$user.location, ignore.case = TRUE),]
-sanantonio&lt;-texas[grepl('San Antonio', texas$user.location, ignore.case = TRUE),]
-texas.other &lt;- texas[! (grepl('austin', texas$user.location, ignore.case = TRUE) | 
-                          grepl('dallas', texas$user.location, ignore.case = TRUE) | 
-                          grepl('houston', texas$user.location, ignore.case = TRUE)) | 
-                       grepl('San Antonio', texas$user.location, ignore.case = TRUE) &amp; 
-                       (grepl('TX', texas$user.location) | 
-                          grepl('texas', texas$user.location, ignore.case = TRUE)), ]
-texas.cities &lt;-texas[ (grepl('austin', texas$user.location, ignore.case = TRUE) | 
-                          grepl('dallas', texas$user.location, ignore.case = TRUE) | 
-                          grepl('houston', texas$user.location, ignore.case = TRUE)) | 
-                       grepl('San Antonio', texas$user.location, ignore.case = TRUE), ]
-
-
-
-library(XML)
-library(tm)</code></pre>
-<pre><code>## Loading required package: NLP</code></pre>
-<pre class="r"><code>library(topicmodels)
-library(SnowballC)
-# clean and compute tfidf
-
-library(XML)
-library(tm)
-library(topicmodels)
-
-# clean Seattle data
-seattle.text &lt;- VCorpus(DataframeSource(as.data.frame(seattle$author.text)))
-seattle.text.clean = tm_map(seattle.text, stripWhitespace)                          # remove extra whitespace
-seattle.text.clean = tm_map(seattle.text.clean, removeNumbers)                      # remove numbers
-seattle.text.clean = tm_map(seattle.text.clean, removePunctuation)                  # remove punctuation
-seattle.text.clean = tm_map(seattle.text.clean, content_transformer(tolower))       # ignore case
-seattle.text.clean = tm_map(seattle.text.clean, removeWords, stopwords(&quot;english&quot;))  # remove stop words
-seattle.text.clean = tm_map(seattle.text.clean, stemDocument, lazy = TRUE)                       # stem all words
-seattle.text.clean.tf = DocumentTermMatrix(seattle.text.clean, control = list(weighting = weightTf))
-
-# clean Washington.Other data
-washington.other.text &lt;- VCorpus(DataframeSource(as.data.frame(washington.other$author.text)))
-washington.other.text.clean = tm_map(washington.other.text, stripWhitespace)                          # remove extra whitespace
-washington.other.text.clean = tm_map(washington.other.text.clean, removeNumbers)                      # remove numbers
-washington.other.text.clean = tm_map(washington.other.text.clean, removePunctuation)                  # remove punctuation
-washington.other.text.clean = tm_map(washington.other.text.clean, content_transformer(tolower))       # ignore case
-washington.other.text.clean = tm_map(washington.other.text.clean, removeWords, stopwords(&quot;english&quot;))  # remove stop words
-washington.other.text.clean = tm_map(washington.other.text.clean, stemDocument, lazy = TRUE)          # stem all words
-washington.other.text.clean.tf = DocumentTermMatrix(washington.other.text.clean, control = list(weighting = weightTf))
-
-# clean Houston data
-houston.text &lt;- VCorpus(DataframeSource(as.data.frame(houston$author.text)))
-houston.text.clean = tm_map(houston.text, stripWhitespace)                          # remove extra whitespace
-houston.text.clean = tm_map(houston.text.clean, removeNumbers)                      # remove numbers
-houston.text.clean = tm_map(houston.text.clean, removePunctuation)                  # remove punctuation
-houston.text.clean = tm_map(houston.text.clean, content_transformer(tolower))       # ignore case
-houston.text.clean = tm_map(houston.text.clean, removeWords, stopwords(&quot;english&quot;))  # remove stop words
-houston.text.clean = tm_map(houston.text.clean, stemDocument, lazy = TRUE)          # stem all words
-houston.text.clean.tf = DocumentTermMatrix(houston.text.clean, control = list(weighting = weightTf))
-
-# clean Austin data
-austin.text &lt;- VCorpus(DataframeSource(as.data.frame(austin$author.text)))
-austin.text.clean = tm_map(austin.text, stripWhitespace)                          # remove extra whitespace
-austin.text.clean = tm_map(austin.text.clean, removeNumbers)                      # remove numbers
-austin.text.clean = tm_map(austin.text.clean, removePunctuation)                  # remove punctuation
-austin.text.clean = tm_map(austin.text.clean, content_transformer(tolower))       # ignore case
-austin.text.clean = tm_map(austin.text.clean, removeWords, stopwords(&quot;english&quot;))  # remove stop words
-austin.text.clean = tm_map(austin.text.clean, stemDocument, lazy = TRUE)          # stem all words
-austin.text.clean.tf = DocumentTermMatrix(austin.text.clean, control = list(weighting = weightTf))
-
-# clean Dallas data
-dallas.text &lt;- VCorpus(DataframeSource(as.data.frame(dallas$author.text)))
-dallas.text.clean = tm_map(dallas.text, stripWhitespace)                          # remove extra whitespace
-dallas.text.clean = tm_map(dallas.text.clean, removeNumbers)                      # remove numbers
-dallas.text.clean = tm_map(dallas.text.clean, removePunctuation)                  # remove punctuation
-dallas.text.clean = tm_map(dallas.text.clean, content_transformer(tolower))       # ignore case
-dallas.text.clean = tm_map(dallas.text.clean, removeWords, stopwords(&quot;english&quot;))  # remove stop words
-dallas.text.clean = tm_map(dallas.text.clean, stemDocument, lazy = TRUE)          # stem all words
-dallas.text.clean.tf = DocumentTermMatrix(dallas.text.clean, control = list(weighting = weightTf))
-
-# clean Texas.Other data
-texas.other.text &lt;- VCorpus(DataframeSource(as.data.frame(texas.other$author.text)))
-texas.other.text.clean = tm_map(texas.other.text, stripWhitespace)                          # remove extra whitespace
-texas.other.text.clean = tm_map(texas.other.text.clean, removeNumbers)                      # remove numbers
-texas.other.text.clean = tm_map(texas.other.text.clean, removePunctuation)                  # remove punctuation
-texas.other.text.clean = tm_map(texas.other.text.clean, content_transformer(tolower))       # ignore case
-texas.other.text.clean = tm_map(texas.other.text.clean, removeWords, stopwords(&quot;english&quot;))  # remove stop words
-texas.other.text.clean = tm_map(texas.other.text.clean, stemDocument, lazy = TRUE)          # stem all words
-texas.other.text.clean.tf = DocumentTermMatrix(texas.other.text.clean, control = list(weighting = weightTf))
-
-#clean san antonio
-san.text &lt;- VCorpus(DataframeSource(as.data.frame(sanantonio$author.text)))
-san.text.clean = tm_map(san.text, stripWhitespace)                          # remove extra whitespace
-san.text.clean = tm_map(san.text.clean, removeNumbers)                      # remove numbers
-san.text.clean = tm_map(san.text.clean, removePunctuation)                  # remove punctuation
-san.text.clean = tm_map(san.text.clean, content_transformer(tolower))       # ignore case
-san.text.clean = tm_map(san.text.clean, removeWords, stopwords(&quot;english&quot;))  # remove stop words
-san.text.clean = tm_map(san.text.clean, stemDocument, lazy = TRUE)          # stem all words
-san.text.clean.tf = DocumentTermMatrix(san.text.clean, control = list(weighting = weightTf))
-
-#clean Texas Cities
-tex.cities.text &lt;- VCorpus(DataframeSource(as.data.frame(texas.cities$author.text)))
-tex.cities.clean = tm_map(tex.cities.text, stripWhitespace)                          # remove extra whitespace
-tex.cities.clean = tm_map(tex.cities.clean, removeNumbers)                      # remove numbers
-tex.cities.clean = tm_map(tex.cities.clean, removePunctuation)                  # remove punctuation
-tex.cities.clean = tm_map(tex.cities.clean, content_transformer(tolower))       # ignore case
-tex.cities.clean = tm_map(tex.cities.clean, removeWords, stopwords(&quot;english&quot;))  # remove stop words
-tex.cities.clean = tm_map(tex.cities.clean, stemDocument, lazy = TRUE)          # stem all words
-tex.cities.clean.tf = DocumentTermMatrix(tex.cities.clean, control = list(weighting = weightTf))
-
-# train topic model with 10 topics
-#Austin
-austin.topic.model = LDA(austin.text.clean.tf, 10)
-#Dallas
-dallas.topic.model = LDA(dallas.text.clean.tf, 10)
-#Houston
-houston.topic.model = LDA(austin.text.clean.tf, 10)
-#San Antonio
-sanantonio.topic.model = LDA(san.text.clean.tf, 10)
-#Texas
-row.sums = apply(texas.other.text.clean.tf, 1, sum)
-texas.other.text.clean.tf = texas.other.text.clean.tf[row.sums &gt; 0,]
-texas.topic.model = LDA(texas.other.text.clean.tf, 10)
-#Seattle
-seattle.topic.model = LDA(seattle.text.clean.tf, 10)
-#Washington State
-washington.topic.model = LDA(washington.other.text.clean.tf, 10)
-#Texas Cities
-texas.cities.topic.model = LDA(tex.cities.clean.tf, 10)
-
-# look at the top 10 words within the first 5 topics
+# look at the top 10 words within the 10 topics
 #austin
 terms(austin.topic.model, 10)[,1:10]</code></pre>
-<pre><code>##       Topic 1           Topic 2  Topic 3   Topic 4   Topic 5      Topic 6 
+<pre><code>##       Topic 1           Topic 2  Topic 3   Topic 4   Topic 5      Topic 6
 ##  [1,] &quot;austin&quot;          &quot;now&quot;    &quot;can&quot;     &quot;time&quot;    &quot;job&quot;        &quot;austin&quot;
-##  [2,] &quot;atxtrafficaccid&quot; &quot;austin&quot; &quot;love&quot;    &quot;day&quot;     &quot;hire&quot;       &quot;amp&quot;   
-##  [3,] &quot;txi&quot;             &quot;vote&quot;   &quot;austin&quot;  &quot;new&quot;     &quot;austin&quot;     &quot;time&quot;  
-##  [4,] &quot;back&quot;            &quot;south&quot;  &quot;art&quot;     &quot;thank&quot;   &quot;latest&quot;     &quot;park&quot;  
-##  [5,] &quot;delay&quot;           &quot;trend&quot;  &quot;peopl&quot;   &quot;amp&quot;     &quot;click&quot;      &quot;just&quot;  
-##  [6,] &quot;min&quot;             &quot;mph&quot;    &quot;know&quot;    &quot;get&quot;     &quot;work&quot;       &quot;amaz&quot;  
-##  [7,] &quot;traffic&quot;         &quot;trump&quot;  &quot;just&quot;    &quot;circuit&quot; &quot;open&quot;       &quot;cedar&quot; 
-##  [8,] &quot;stop&quot;            &quot;right&quot;  &quot;get&quot;     &quot;texa&quot;    &quot;appli&quot;      &quot;great&quot; 
-##  [9,] &quot;near&quot;            &quot;earli&quot;  &quot;day&quot;     &quot;work&quot;    &quot;careerarcw&quot; &quot;year&quot;  
-## [10,] &quot;blvd&quot;            &quot;cloud&quot;  &quot;mondote&quot; &quot;can&quot;     &quot;recommend&quot;  &quot;love&quot;  
+##  [2,] &quot;atxtrafficaccid&quot; &quot;austin&quot; &quot;love&quot;    &quot;day&quot;     &quot;hire&quot;       &quot;amp&quot;
+##  [3,] &quot;txi&quot;             &quot;vote&quot;   &quot;austin&quot;  &quot;new&quot;     &quot;austin&quot;     &quot;time&quot;
+##  [4,] &quot;back&quot;            &quot;south&quot;  &quot;art&quot;     &quot;thank&quot;   &quot;latest&quot;     &quot;park&quot;
+##  [5,] &quot;delay&quot;           &quot;trend&quot;  &quot;peopl&quot;   &quot;amp&quot;     &quot;click&quot;      &quot;just&quot;
+##  [6,] &quot;min&quot;             &quot;mph&quot;    &quot;know&quot;    &quot;get&quot;     &quot;work&quot;       &quot;amaz&quot;
+##  [7,] &quot;traffic&quot;         &quot;trump&quot;  &quot;just&quot;    &quot;circuit&quot; &quot;open&quot;       &quot;cedar&quot;
+##  [8,] &quot;stop&quot;            &quot;right&quot;  &quot;get&quot;     &quot;texa&quot;    &quot;appli&quot;      &quot;great&quot;
+##  [9,] &quot;near&quot;            &quot;earli&quot;  &quot;day&quot;     &quot;work&quot;    &quot;careerarcw&quot; &quot;year&quot;
+## [10,] &quot;blvd&quot;            &quot;cloud&quot;  &quot;mondote&quot; &quot;can&quot;     &quot;recommend&quot;  &quot;love&quot;
 ##       Topic 7  Topic 8  Topic 9   Topic 10
-##  [1,] &quot;austin&quot; &quot;atx&quot;    &quot;austin&quot;  &quot;job&quot;   
-##  [2,] &quot;amp&quot;    &quot;today&quot;  &quot;texa&quot;    &quot;hire&quot;  
+##  [1,] &quot;austin&quot; &quot;atx&quot;    &quot;austin&quot;  &quot;job&quot;
+##  [2,] &quot;amp&quot;    &quot;today&quot;  &quot;texa&quot;    &quot;hire&quot;
 ##  [3,] &quot;wind&quot;   &quot;day&quot;    &quot;post&quot;    &quot;hospit&quot;
-##  [4,] &quot;mph&quot;    &quot;texa&quot;   &quot;photo&quot;   &quot;sonic&quot; 
+##  [4,] &quot;mph&quot;    &quot;texa&quot;   &quot;photo&quot;   &quot;sonic&quot;
 ##  [5,] &quot;humid&quot;  &quot;got&quot;    &quot;state&quot;   &quot;austin&quot;
 ##  [6,] &quot;new&quot;    &quot;beauti&quot; &quot;univers&quot; &quot;latest&quot;
-##  [7,] &quot;photo&quot;  &quot;one&quot;    &quot;night&quot;   &quot;fit&quot;   
-##  [8,] &quot;sky&quot;    &quot;live&quot;   &quot;coffe&quot;   &quot;open&quot;  
-##  [9,] &quot;fun&quot;    &quot;amp&quot;    &quot;park&quot;    &quot;click&quot; 
+##  [7,] &quot;photo&quot;  &quot;one&quot;    &quot;night&quot;   &quot;fit&quot;
+##  [8,] &quot;sky&quot;    &quot;live&quot;   &quot;coffe&quot;   &quot;open&quot;
+##  [9,] &quot;fun&quot;    &quot;amp&quot;    &quot;park&quot;    &quot;click&quot;
 ## [10,] &quot;atx&quot;    &quot;great&quot;  &quot;lake&quot;    &quot;great&quot;</code></pre>
 <pre class="r"><code>#Dallas
 terms(dallas.topic.model, 10)[,1:10]</code></pre>
-<pre><code>##       Topic 1     Topic 2 Topic 3   Topic 4 Topic 5          
-##  [1,] &quot;thank&quot;     &quot;don&quot;   &quot;dalla&quot;   &quot;fair&quot;  &quot;back&quot;           
-##  [2,] &quot;get&quot;       &quot;get&quot;   &quot;love&quot;    &quot;state&quot; &quot;stop&quot;           
-##  [3,] &quot;see&quot;       &quot;like&quot;  &quot;day&quot;     &quot;texa&quot;  &quot;traffic&quot;        
-##  [4,] &quot;today&quot;     &quot;gonna&quot; &quot;hous&quot;    &quot;amp&quot;   &quot;delay&quot;          
-##  [5,] &quot;can&quot;       &quot;can&quot;   &quot;art&quot;     &quot;dalla&quot; &quot;lane&quot;           
-##  [6,] &quot;time&quot;      &quot;love&quot;  &quot;littl&quot;   &quot;night&quot; &quot;block&quot;          
-##  [7,] &quot;night&quot;     &quot;need&quot;  &quot;weekend&quot; &quot;just&quot;  &quot;dalla&quot;          
+<pre><code>##       Topic 1     Topic 2 Topic 3   Topic 4 Topic 5
+##  [1,] &quot;thank&quot;     &quot;don&quot;   &quot;dalla&quot;   &quot;fair&quot;  &quot;back&quot;
+##  [2,] &quot;get&quot;       &quot;get&quot;   &quot;love&quot;    &quot;state&quot; &quot;stop&quot;
+##  [3,] &quot;see&quot;       &quot;like&quot;  &quot;day&quot;     &quot;texa&quot;  &quot;traffic&quot;
+##  [4,] &quot;today&quot;     &quot;gonna&quot; &quot;hous&quot;    &quot;amp&quot;   &quot;delay&quot;
+##  [5,] &quot;can&quot;       &quot;can&quot;   &quot;art&quot;     &quot;dalla&quot; &quot;lane&quot;
+##  [6,] &quot;time&quot;      &quot;love&quot;  &quot;littl&quot;   &quot;night&quot; &quot;block&quot;
+##  [7,] &quot;night&quot;     &quot;need&quot;  &quot;weekend&quot; &quot;just&quot;  &quot;dalla&quot;
 ##  [8,] &quot;come&quot;      &quot;got&quot;   &quot;lake&quot;    &quot;great&quot; &quot;dfwtrafficaccid&quot;
-##  [9,] &quot;day&quot;       &quot;kill&quot;  &quot;rock&quot;    &quot;day&quot;   &quot;min&quot;            
-## [10,] &quot;barcelona&quot; &quot;want&quot;  &quot;oak&quot;     &quot;morn&quot;  &quot;right&quot;          
+##  [9,] &quot;day&quot;       &quot;kill&quot;  &quot;rock&quot;    &quot;day&quot;   &quot;min&quot;
+## [10,] &quot;barcelona&quot; &quot;want&quot;  &quot;oak&quot;     &quot;morn&quot;  &quot;right&quot;
 ##       Topic 6          Topic 7  Topic 8  Topic 9   Topic 10
-##  [1,] &quot;dalla&quot;          &quot;post&quot;   &quot;now&quot;    &quot;dalla&quot;   &quot;like&quot;  
-##  [2,] &quot;cosplay&quot;        &quot;photo&quot;  &quot;mph&quot;    &quot;worth&quot;   &quot;shit&quot;  
-##  [3,] &quot;love&quot;           &quot;dalla&quot;  &quot;dalla&quot;  &quot;txi&quot;     &quot;don&quot;   
-##  [4,] &quot;captur&quot;         &quot;amp&quot;    &quot;trend&quot;  &quot;trend&quot;   &quot;get&quot;   
-##  [5,] &quot;comiccon&quot;       &quot;texa&quot;   &quot;cowboy&quot; &quot;sunday&quot;  &quot;just&quot;  
-##  [6,] &quot;fanday&quot;         &quot;just&quot;   &quot;sky&quot;    &quot;hour&quot;    &quot;can&quot;   
-##  [7,] &quot;best&quot;           &quot;cowboy&quot; &quot;wind&quot;   &quot;topic&quot;   &quot;amp&quot;   
-##  [8,] &quot;dallascomiccon&quot; &quot;day&quot;    &quot;clear&quot;  &quot;place&quot;   &quot;got&quot;   
-##  [9,] &quot;yogomisom&quot;      &quot;fair&quot;   &quot;humid&quot;  &quot;top&quot;     &quot;man&quot;   
+##  [1,] &quot;dalla&quot;          &quot;post&quot;   &quot;now&quot;    &quot;dalla&quot;   &quot;like&quot;
+##  [2,] &quot;cosplay&quot;        &quot;photo&quot;  &quot;mph&quot;    &quot;worth&quot;   &quot;shit&quot;
+##  [3,] &quot;love&quot;           &quot;dalla&quot;  &quot;dalla&quot;  &quot;txi&quot;     &quot;don&quot;
+##  [4,] &quot;captur&quot;         &quot;amp&quot;    &quot;trend&quot;  &quot;trend&quot;   &quot;get&quot;
+##  [5,] &quot;comiccon&quot;       &quot;texa&quot;   &quot;cowboy&quot; &quot;sunday&quot;  &quot;just&quot;
+##  [6,] &quot;fanday&quot;         &quot;just&quot;   &quot;sky&quot;    &quot;hour&quot;    &quot;can&quot;
+##  [7,] &quot;best&quot;           &quot;cowboy&quot; &quot;wind&quot;   &quot;topic&quot;   &quot;amp&quot;
+##  [8,] &quot;dallascomiccon&quot; &quot;day&quot;    &quot;clear&quot;  &quot;place&quot;   &quot;got&quot;
+##  [9,] &quot;yogomisom&quot;      &quot;fair&quot;   &quot;humid&quot;  &quot;top&quot;     &quot;man&quot;
 ## [10,] &quot;time&quot;           &quot;txi&quot;    &quot;south&quot;  &quot;hashtag&quot; &quot;good&quot;</code></pre>
 <pre class="r"><code>#houston
 terms(houston.topic.model, 10)[,1:10]</code></pre>
-<pre><code>##       Topic 1  Topic 2           Topic 3  Topic 4  Topic 5 Topic 6 
+<pre><code>##       Topic 1  Topic 2           Topic 3  Topic 4  Topic 5 Topic 6
 ##  [1,] &quot;job&quot;    &quot;austin&quot;          &quot;now&quot;    &quot;job&quot;    &quot;get&quot;   &quot;austin&quot;
-##  [2,] &quot;hire&quot;   &quot;atxtrafficaccid&quot; &quot;austin&quot; &quot;austin&quot; &quot;amp&quot;   &quot;texa&quot;  
-##  [3,] &quot;hospit&quot; &quot;txi&quot;             &quot;mph&quot;    &quot;hire&quot;   &quot;thank&quot; &quot;state&quot; 
-##  [4,] &quot;sonic&quot;  &quot;back&quot;            &quot;sky&quot;    &quot;latest&quot; &quot;best&quot;  &quot;atx&quot;   
-##  [5,] &quot;austin&quot; &quot;delay&quot;           &quot;cloud&quot;  &quot;work&quot;   &quot;day&quot;   &quot;one&quot;   
-##  [6,] &quot;latest&quot; &quot;min&quot;             &quot;trend&quot;  &quot;click&quot;  &quot;last&quot;  &quot;day&quot;   
-##  [7,] &quot;fit&quot;    &quot;traffic&quot;         &quot;art&quot;    &quot;engin&quot;  &quot;night&quot; &quot;today&quot; 
-##  [8,] &quot;great&quot;  &quot;stop&quot;            &quot;clear&quot;  &quot;open&quot;   &quot;hous&quot;  &quot;year&quot;  
-##  [9,] &quot;click&quot;  &quot;near&quot;            &quot;wind&quot;   &quot;great&quot;  &quot;love&quot;  &quot;littl&quot; 
-## [10,] &quot;open&quot;   &quot;blvd&quot;            &quot;south&quot;  &quot;fit&quot;    &quot;time&quot;  &quot;place&quot; 
+##  [2,] &quot;hire&quot;   &quot;atxtrafficaccid&quot; &quot;austin&quot; &quot;austin&quot; &quot;amp&quot;   &quot;texa&quot;
+##  [3,] &quot;hospit&quot; &quot;txi&quot;             &quot;mph&quot;    &quot;hire&quot;   &quot;thank&quot; &quot;state&quot;
+##  [4,] &quot;sonic&quot;  &quot;back&quot;            &quot;sky&quot;    &quot;latest&quot; &quot;best&quot;  &quot;atx&quot;
+##  [5,] &quot;austin&quot; &quot;delay&quot;           &quot;cloud&quot;  &quot;work&quot;   &quot;day&quot;   &quot;one&quot;
+##  [6,] &quot;latest&quot; &quot;min&quot;             &quot;trend&quot;  &quot;click&quot;  &quot;last&quot;  &quot;day&quot;
+##  [7,] &quot;fit&quot;    &quot;traffic&quot;         &quot;art&quot;    &quot;engin&quot;  &quot;night&quot; &quot;today&quot;
+##  [8,] &quot;great&quot;  &quot;stop&quot;            &quot;clear&quot;  &quot;open&quot;   &quot;hous&quot;  &quot;year&quot;
+##  [9,] &quot;click&quot;  &quot;near&quot;            &quot;wind&quot;   &quot;great&quot;  &quot;love&quot;  &quot;littl&quot;
+## [10,] &quot;open&quot;   &quot;blvd&quot;            &quot;south&quot;  &quot;fit&quot;    &quot;time&quot;  &quot;place&quot;
 ##       Topic 7  Topic 8  Topic 9   Topic 10
 ##  [1,] &quot;austin&quot; &quot;job&quot;    &quot;amp&quot;     &quot;austin&quot;
-##  [2,] &quot;photo&quot;  &quot;hire&quot;   &quot;circuit&quot; &quot;atx&quot;   
-##  [3,] &quot;post&quot;   &quot;austin&quot; &quot;austin&quot;  &quot;amp&quot;   
-##  [4,] &quot;new&quot;    &quot;latest&quot; &quot;america&quot; &quot;texa&quot;  
-##  [5,] &quot;can&quot;    &quot;click&quot;  &quot;love&quot;    &quot;parti&quot; 
-##  [6,] &quot;just&quot;   &quot;retail&quot; &quot;race&quot;    &quot;coffe&quot; 
+##  [2,] &quot;photo&quot;  &quot;hire&quot;   &quot;circuit&quot; &quot;atx&quot;
+##  [3,] &quot;post&quot;   &quot;austin&quot; &quot;austin&quot;  &quot;amp&quot;
+##  [4,] &quot;new&quot;    &quot;latest&quot; &quot;america&quot; &quot;texa&quot;
+##  [5,] &quot;can&quot;    &quot;click&quot;  &quot;love&quot;    &quot;parti&quot;
+##  [6,] &quot;just&quot;   &quot;retail&quot; &quot;race&quot;    &quot;coffe&quot;
 ##  [7,] &quot;love&quot;   &quot;work&quot;   &quot;cota&quot;    &quot;friend&quot;
-##  [8,] &quot;texa&quot;   &quot;sale&quot;   &quot;time&quot;    &quot;girl&quot;  
+##  [8,] &quot;texa&quot;   &quot;sale&quot;   &quot;time&quot;    &quot;girl&quot;
 ##  [9,] &quot;peopl&quot;  &quot;nurs&quot;   &quot;debat&quot;   &quot;dinner&quot;
 ## [10,] &quot;day&quot;    &quot;open&quot;   &quot;park&quot;    &quot;watch&quot;</code></pre>
 <pre class="r"><code>#San antonio
 terms(sanantonio.topic.model, 10)[,1:10]</code></pre>
-<pre><code>##       Topic 1      Topic 2      Topic 3        Topic 4      Topic 5  
-##  [1,] &quot;job&quot;        &quot;job&quot;        &quot;day&quot;          &quot;job&quot;        &quot;post&quot;   
-##  [2,] &quot;hire&quot;       &quot;hire&quot;       &quot;amp&quot;          &quot;sanantonio&quot; &quot;photo&quot;  
-##  [3,] &quot;sanantonio&quot; &quot;sanantonio&quot; &quot;park&quot;         &quot;hire&quot;       &quot;san&quot;    
+<pre><code>##       Topic 1      Topic 2      Topic 3        Topic 4      Topic 5
+##  [1,] &quot;job&quot;        &quot;job&quot;        &quot;day&quot;          &quot;job&quot;        &quot;post&quot;
+##  [2,] &quot;hire&quot;       &quot;hire&quot;       &quot;amp&quot;          &quot;sanantonio&quot; &quot;photo&quot;
+##  [3,] &quot;sanantonio&quot; &quot;sanantonio&quot; &quot;park&quot;         &quot;hire&quot;       &quot;san&quot;
 ##  [4,] &quot;retail&quot;     &quot;restaur&quot;    &quot;sunday&quot;       &quot;latest&quot;     &quot;antonio&quot;
-##  [5,] &quot;sale&quot;       &quot;hospit&quot;     &quot;great&quot;        &quot;open&quot;       &quot;just&quot;   
-##  [6,] &quot;latest&quot;     &quot;sonic&quot;      &quot;sundayfunday&quot; &quot;work&quot;       &quot;amp&quot;    
-##  [7,] &quot;store&quot;      &quot;latest&quot;     &quot;texa&quot;         &quot;careerarcw&quot; &quot;love&quot;   
-##  [8,] &quot;click&quot;      &quot;work&quot;       &quot;today&quot;        &quot;click&quot;      &quot;app&quot;    
-##  [9,] &quot;open&quot;       &quot;click&quot;      &quot;austin&quot;       &quot;nurs&quot;       &quot;bridg&quot;  
-## [10,] &quot;fit&quot;        &quot;careerarcw&quot; &quot;morn&quot;         &quot;anyon&quot;      &quot;don&quot;    
-##       Topic 6        Topic 7          Topic 8   Topic 9      Topic 10   
-##  [1,] &quot;back&quot;         &quot;manufactur&quot;     &quot;san&quot;     &quot;now&quot;        &quot;amp&quot;      
-##  [2,] &quot;stop&quot;         &quot;sanantonio&quot;     &quot;antonio&quot; &quot;antonio&quot;    &quot;get&quot;      
+##  [5,] &quot;sale&quot;       &quot;hospit&quot;     &quot;great&quot;        &quot;open&quot;       &quot;just&quot;
+##  [6,] &quot;latest&quot;     &quot;sonic&quot;      &quot;sundayfunday&quot; &quot;work&quot;       &quot;amp&quot;
+##  [7,] &quot;store&quot;      &quot;latest&quot;     &quot;texa&quot;         &quot;careerarcw&quot; &quot;love&quot;
+##  [8,] &quot;click&quot;      &quot;work&quot;       &quot;today&quot;        &quot;click&quot;      &quot;app&quot;
+##  [9,] &quot;open&quot;       &quot;click&quot;      &quot;austin&quot;       &quot;nurs&quot;       &quot;bridg&quot;
+## [10,] &quot;fit&quot;        &quot;careerarcw&quot; &quot;morn&quot;         &quot;anyon&quot;      &quot;don&quot;
+##       Topic 6        Topic 7          Topic 8   Topic 9      Topic 10
+##  [1,] &quot;back&quot;         &quot;manufactur&quot;     &quot;san&quot;     &quot;now&quot;        &quot;amp&quot;
+##  [2,] &quot;stop&quot;         &quot;sanantonio&quot;     &quot;antonio&quot; &quot;antonio&quot;    &quot;get&quot;
 ##  [3,] &quot;traffic&quot;      &quot;texa&quot;           &quot;txi&quot;     &quot;mph&quot;        &quot;halloween&quot;
-##  [4,] &quot;delay&quot;        &quot;customerservic&quot; &quot;like&quot;    &quot;san&quot;        &quot;around&quot;   
-##  [5,] &quot;trafficaccid&quot; &quot;great&quot;          &quot;see&quot;     &quot;wind&quot;       &quot;corner&quot;   
-##  [6,] &quot;sanantonio&quot;   &quot;cleric&quot;         &quot;can&quot;     &quot;cloud&quot;      &quot;picnic&quot;   
-##  [7,] &quot;right&quot;        &quot;market&quot;         &quot;stone&quot;   &quot;humid&quot;      &quot;session&quot;  
-##  [8,] &quot;min&quot;          &quot;join&quot;           &quot;just&quot;    &quot;trend&quot;      &quot;buy&quot;      
-##  [9,] &quot;lane&quot;         &quot;night&quot;          &quot;texa&quot;    &quot;rickgodwin&quot; &quot;haul&quot;     
+##  [4,] &quot;delay&quot;        &quot;customerservic&quot; &quot;like&quot;    &quot;san&quot;        &quot;around&quot;
+##  [5,] &quot;trafficaccid&quot; &quot;great&quot;          &quot;see&quot;     &quot;wind&quot;       &quot;corner&quot;
+##  [6,] &quot;sanantonio&quot;   &quot;cleric&quot;         &quot;can&quot;     &quot;cloud&quot;      &quot;picnic&quot;
+##  [7,] &quot;right&quot;        &quot;market&quot;         &quot;stone&quot;   &quot;humid&quot;      &quot;session&quot;
+##  [8,] &quot;min&quot;          &quot;join&quot;           &quot;just&quot;    &quot;trend&quot;      &quot;buy&quot;
+##  [9,] &quot;lane&quot;         &quot;night&quot;          &quot;texa&quot;    &quot;rickgodwin&quot; &quot;haul&quot;
 ## [10,] &quot;hwi&quot;          &quot;look&quot;           &quot;free&quot;    &quot;south&quot;      &quot;min&quot;</code></pre>
 <pre class="r"><code>#Texas
 terms(texas.topic.model, 10)[,1:10]</code></pre>
-<pre><code>##       Topic 1   Topic 2  Topic 3    Topic 4     Topic 5   
-##  [1,] &quot;houston&quot; &quot;job&quot;    &quot;pumpkin&quot;  &quot;job&quot;       &quot;texa&quot;    
-##  [2,] &quot;austin&quot;  &quot;hire&quot;   &quot;love&quot;     &quot;hire&quot;      &quot;day&quot;     
-##  [3,] &quot;san&quot;     &quot;hospit&quot; &quot;amp&quot;      &quot;latest&quot;    &quot;thank&quot;   
-##  [4,] &quot;antonio&quot; &quot;latest&quot; &quot;oklahoma&quot; &quot;open&quot;      &quot;happi&quot;   
+<pre><code>##       Topic 1   Topic 2  Topic 3    Topic 4     Topic 5
+##  [1,] &quot;houston&quot; &quot;job&quot;    &quot;pumpkin&quot;  &quot;job&quot;       &quot;texa&quot;
+##  [2,] &quot;austin&quot;  &quot;hire&quot;   &quot;love&quot;     &quot;hire&quot;      &quot;day&quot;
+##  [3,] &quot;san&quot;     &quot;hospit&quot; &quot;amp&quot;      &quot;latest&quot;    &quot;thank&quot;
+##  [4,] &quot;antonio&quot; &quot;latest&quot; &quot;oklahoma&quot; &quot;open&quot;      &quot;happi&quot;
 ##  [5,] &quot;texa&quot;    &quot;work&quot;   &quot;today&quot;    &quot;nurs&quot;      &quot;birthday&quot;
-##  [6,] &quot;txi&quot;     &quot;open&quot;   &quot;tulsa&quot;    &quot;work&quot;      &quot;love&quot;    
-##  [7,] &quot;amp&quot;     &quot;click&quot;  &quot;back&quot;     &quot;click&quot;     &quot;amp&quot;     
-##  [8,] &quot;just&quot;    &quot;sonic&quot;  &quot;day&quot;      &quot;anyon&quot;     &quot;dalla&quot;   
-##  [9,] &quot;bar&quot;     &quot;great&quot;  &quot;list&quot;     &quot;recommend&quot; &quot;weekend&quot; 
+##  [6,] &quot;txi&quot;     &quot;open&quot;   &quot;tulsa&quot;    &quot;work&quot;      &quot;love&quot;
+##  [7,] &quot;amp&quot;     &quot;click&quot;  &quot;back&quot;     &quot;click&quot;     &quot;amp&quot;
+##  [8,] &quot;just&quot;    &quot;sonic&quot;  &quot;day&quot;      &quot;anyon&quot;     &quot;dalla&quot;
+##  [9,] &quot;bar&quot;     &quot;great&quot;  &quot;list&quot;     &quot;recommend&quot; &quot;weekend&quot;
 ## [10,] &quot;market&quot;  &quot;fit&quot;    &quot;ave&quot;      &quot;fit&quot;       &quot;medfield&quot;
-##       Topic 6                  Topic 7 Topic 8 Topic 9 Topic 10    
-##  [1,] &quot;nowplay&quot;                &quot;post&quot;  &quot;state&quot; &quot;txi&quot;   &quot;mph&quot;       
-##  [2,] &quot;cubevenuepalmillabeach&quot; &quot;photo&quot; &quot;texa&quot;  &quot;bed&quot;   &quot;humid&quot;     
-##  [3,] &quot;sanmarco&quot;               &quot;just&quot;  &quot;fair&quot;  &quot;new&quot;   &quot;wind&quot;      
-##  [4,] &quot;pool&quot;                   &quot;get&quot;   &quot;time&quot;  &quot;fort&quot;  &quot;weather&quot;   
-##  [5,] &quot;cubevenuenissan&quot;        &quot;high&quot;  &quot;citi&quot;  &quot;worth&quot; &quot;pressur&quot;   
+##       Topic 6                  Topic 7 Topic 8 Topic 9 Topic 10
+##  [1,] &quot;nowplay&quot;                &quot;post&quot;  &quot;state&quot; &quot;txi&quot;   &quot;mph&quot;
+##  [2,] &quot;cubevenuepalmillabeach&quot; &quot;photo&quot; &quot;texa&quot;  &quot;bed&quot;   &quot;humid&quot;
+##  [3,] &quot;sanmarco&quot;               &quot;just&quot;  &quot;fair&quot;  &quot;new&quot;   &quot;wind&quot;
+##  [4,] &quot;pool&quot;                   &quot;get&quot;   &quot;time&quot;  &quot;fort&quot;  &quot;weather&quot;
+##  [5,] &quot;cubevenuenissan&quot;        &quot;high&quot;  &quot;citi&quot;  &quot;worth&quot; &quot;pressur&quot;
 ##  [6,] &quot;cubevenuetoyotaofboern&quot; &quot;now&quot;   &quot;day&quot;   &quot;bath&quot;  &quot;temperatur&quot;
-##  [7,] &quot;blackmarlin&quot;            &quot;like&quot;  &quot;get&quot;   &quot;dalla&quot; &quot;rain&quot;      
-##  [8,] &quot;amp&quot;                    &quot;amp&quot;   &quot;today&quot; &quot;now&quot;   &quot;feel&quot;      
-##  [9,] &quot;love&quot;                   &quot;can&quot;   &quot;night&quot; &quot;gift&quot;  &quot;gust&quot;      
+##  [7,] &quot;blackmarlin&quot;            &quot;like&quot;  &quot;get&quot;   &quot;dalla&quot; &quot;rain&quot;
+##  [8,] &quot;amp&quot;                    &quot;amp&quot;   &quot;today&quot; &quot;now&quot;   &quot;feel&quot;
+##  [9,] &quot;love&quot;                   &quot;can&quot;   &quot;night&quot; &quot;gift&quot;  &quot;gust&quot;
 ## [10,] &quot;fuck&quot;                   &quot;don&quot;   &quot;great&quot; &quot;paso&quot;  &quot;today&quot;</code></pre>
 <pre class="r"><code>#Seattle
 terms(seattle.topic.model, 10)[,1:10]</code></pre>
-<pre><code>##       Topic 1      Topic 2   Topic 3  Topic 4       Topic 5   Topic 6     
-##  [1,] &quot;high&quot;       &quot;now&quot;     &quot;fall&quot;   &quot;seattl&quot;      &quot;seattl&quot;  &quot;job&quot;       
-##  [2,] &quot;low&quot;        &quot;seahawk&quot; &quot;speak&quot;  &quot;wai&quot;         &quot;sunday&quot;  &quot;hire&quot;      
-##  [3,] &quot;free&quot;       &quot;seattl&quot;  &quot;day&quot;    &quot;centurylink&quot; &quot;time&quot;    &quot;seattl&quot;    
-##  [4,] &quot;tide&quot;       &quot;rain&quot;    &quot;good&quot;   &quot;field&quot;       &quot;amp&quot;     &quot;hospit&quot;    
-##  [5,] &quot;washington&quot; &quot;one&quot;     &quot;today&quot;  &quot;bar&quot;         &quot;tonight&quot; &quot;latest&quot;    
-##  [6,] &quot;seattl&quot;     &quot;trend&quot;   &quot;behalf&quot; &quot;farm&quot;        &quot;pumpkin&quot; &quot;open&quot;      
-##  [7,] &quot;oregon&quot;     &quot;like&quot;    &quot;seattl&quot; &quot;seahawk&quot;     &quot;last&quot;    &quot;work&quot;      
-##  [8,] &quot;box&quot;        &quot;get&quot;     &quot;endors&quot; &quot;sounder&quot;     &quot;night&quot;   &quot;click&quot;     
-##  [9,] &quot;move&quot;       &quot;mph&quot;     &quot;avail&quot;  &quot;haunt&quot;       &quot;love&quot;    &quot;veteran&quot;   
+<pre><code>##       Topic 1      Topic 2   Topic 3  Topic 4       Topic 5   Topic 6
+##  [1,] &quot;high&quot;       &quot;now&quot;     &quot;fall&quot;   &quot;seattl&quot;      &quot;seattl&quot;  &quot;job&quot;
+##  [2,] &quot;low&quot;        &quot;seahawk&quot; &quot;speak&quot;  &quot;wai&quot;         &quot;sunday&quot;  &quot;hire&quot;
+##  [3,] &quot;free&quot;       &quot;seattl&quot;  &quot;day&quot;    &quot;centurylink&quot; &quot;time&quot;    &quot;seattl&quot;
+##  [4,] &quot;tide&quot;       &quot;rain&quot;    &quot;good&quot;   &quot;field&quot;       &quot;amp&quot;     &quot;hospit&quot;
+##  [5,] &quot;washington&quot; &quot;one&quot;     &quot;today&quot;  &quot;bar&quot;         &quot;tonight&quot; &quot;latest&quot;
+##  [6,] &quot;seattl&quot;     &quot;trend&quot;   &quot;behalf&quot; &quot;farm&quot;        &quot;pumpkin&quot; &quot;open&quot;
+##  [7,] &quot;oregon&quot;     &quot;like&quot;    &quot;seattl&quot; &quot;seahawk&quot;     &quot;last&quot;    &quot;work&quot;
+##  [8,] &quot;box&quot;        &quot;get&quot;     &quot;endors&quot; &quot;sounder&quot;     &quot;night&quot;   &quot;click&quot;
+##  [9,] &quot;move&quot;       &quot;mph&quot;     &quot;avail&quot;  &quot;haunt&quot;       &quot;love&quot;    &quot;veteran&quot;
 ## [10,] &quot;one&quot;        &quot;right&quot;   &quot;littl&quot;  &quot;game&quot;        &quot;today&quot;   &quot;careerarcw&quot;
-##       Topic 7        Topic 8      Topic 9 Topic 10   
-##  [1,] &quot;block&quot;        &quot;job&quot;        &quot;drink&quot; &quot;job&quot;      
-##  [2,] &quot;traffic&quot;      &quot;hire&quot;       &quot;post&quot;  &quot;hire&quot;     
-##  [3,] &quot;back&quot;         &quot;latest&quot;     &quot;photo&quot; &quot;seattl&quot;   
-##  [4,] &quot;trafficaccid&quot; &quot;seattl&quot;     &quot;can&quot;   &quot;latest&quot;   
-##  [5,] &quot;delay&quot;        &quot;open&quot;       &quot;fall&quot;  &quot;open&quot;     
-##  [6,] &quot;lane&quot;         &quot;nurs&quot;       &quot;just&quot;  &quot;click&quot;    
-##  [7,] &quot;stop&quot;         &quot;click&quot;      &quot;boy&quot;   &quot;work&quot;     
-##  [8,] &quot;min&quot;          &quot;work&quot;       &quot;get&quot;   &quot;anyon&quot;    
+##       Topic 7        Topic 8      Topic 9 Topic 10
+##  [1,] &quot;block&quot;        &quot;job&quot;        &quot;drink&quot; &quot;job&quot;
+##  [2,] &quot;traffic&quot;      &quot;hire&quot;       &quot;post&quot;  &quot;hire&quot;
+##  [3,] &quot;back&quot;         &quot;latest&quot;     &quot;photo&quot; &quot;seattl&quot;
+##  [4,] &quot;trafficaccid&quot; &quot;seattl&quot;     &quot;can&quot;   &quot;latest&quot;
+##  [5,] &quot;delay&quot;        &quot;open&quot;       &quot;fall&quot;  &quot;open&quot;
+##  [6,] &quot;lane&quot;         &quot;nurs&quot;       &quot;just&quot;  &quot;click&quot;
+##  [7,] &quot;stop&quot;         &quot;click&quot;      &quot;boy&quot;   &quot;work&quot;
+##  [8,] &quot;min&quot;          &quot;work&quot;       &quot;get&quot;   &quot;anyon&quot;
 ##  [9,] &quot;seattl&quot;       &quot;careerarcw&quot; &quot;one&quot;   &quot;recommend&quot;
 ## [10,] &quot;ave&quot;          &quot;healthcar&quot;  &quot;debat&quot; &quot;appli&quot;</code></pre>
 <pre class="r"><code>#washington State
 terms(washington.topic.model, 10)[,1:10]</code></pre>
-<pre><code>##       Topic 1  Topic 2     Topic 3  Topic 4     Topic 5      Topic 6     
-##  [1,] &quot;job&quot;    &quot;job&quot;       &quot;photo&quot;  &quot;wai&quot;       &quot;job&quot;        &quot;seattl&quot;    
-##  [2,] &quot;hire&quot;   &quot;nurs&quot;      &quot;drink&quot;  &quot;harbor&quot;    &quot;hire&quot;       &quot;fall&quot;      
+<pre><code>##       Topic 1  Topic 2     Topic 3  Topic 4     Topic 5      Topic 6
+##  [1,] &quot;job&quot;    &quot;job&quot;       &quot;photo&quot;  &quot;wai&quot;       &quot;job&quot;        &quot;seattl&quot;
+##  [2,] &quot;hire&quot;   &quot;nurs&quot;      &quot;drink&quot;  &quot;harbor&quot;    &quot;hire&quot;       &quot;fall&quot;
 ##  [3,] &quot;tacoma&quot; &quot;latest&quot;    &quot;today&quot;  &quot;gig&quot;       &quot;latest&quot;     &quot;washington&quot;
-##  [4,] &quot;latest&quot; &quot;hire&quot;      &quot;post&quot;   &quot;pumpkin&quot;   &quot;spokan&quot;     &quot;lake&quot;      
-##  [5,] &quot;hospit&quot; &quot;open&quot;      &quot;run&quot;    &quot;just&quot;      &quot;open&quot;       &quot;gohawk&quot;    
-##  [6,] &quot;open&quot;   &quot;work&quot;      &quot;valley&quot; &quot;redmond&quot;   &quot;healthcar&quot;  &quot;seahawk&quot;   
-##  [7,] &quot;work&quot;   &quot;click&quot;     &quot;day&quot;    &quot;get&quot;       &quot;work&quot;       &quot;day&quot;       
-##  [8,] &quot;click&quot;  &quot;healthcar&quot; &quot;port&quot;   &quot;sammamish&quot; &quot;careerarcw&quot; &quot;beauti&quot;    
-##  [9,] &quot;great&quot;  &quot;health&quot;    &quot;ruston&quot; &quot;see&quot;       &quot;click&quot;      &quot;pumpkin&quot;   
-## [10,] &quot;fit&quot;    &quot;portland&quot;  &quot;friend&quot; &quot;today&quot;     &quot;sale&quot;       &quot;time&quot;      
-##       Topic 7      Topic 8     Topic 9  Topic 10 
-##  [1,] &quot;rain&quot;       &quot;transport&quot; &quot;near&quot;   &quot;list&quot;   
-##  [2,] &quot;mph&quot;        &quot;spokan&quot;    &quot;collis&quot; &quot;amp&quot;    
-##  [3,] &quot;wind&quot;       &quot;driver&quot;    &quot;clear&quot;  &quot;love&quot;   
-##  [4,] &quot;humid&quot;      &quot;ave&quot;       &quot;vehicl&quot; &quot;look&quot;   
-##  [5,] &quot;pressur&quot;    &quot;cdl&quot;       &quot;bridg&quot;  &quot;get&quot;    
+##  [4,] &quot;latest&quot; &quot;hire&quot;      &quot;post&quot;   &quot;pumpkin&quot;   &quot;spokan&quot;     &quot;lake&quot;
+##  [5,] &quot;hospit&quot; &quot;open&quot;      &quot;run&quot;    &quot;just&quot;      &quot;open&quot;       &quot;gohawk&quot;
+##  [6,] &quot;open&quot;   &quot;work&quot;      &quot;valley&quot; &quot;redmond&quot;   &quot;healthcar&quot;  &quot;seahawk&quot;
+##  [7,] &quot;work&quot;   &quot;click&quot;     &quot;day&quot;    &quot;get&quot;       &quot;work&quot;       &quot;day&quot;
+##  [8,] &quot;click&quot;  &quot;healthcar&quot; &quot;port&quot;   &quot;sammamish&quot; &quot;careerarcw&quot; &quot;beauti&quot;
+##  [9,] &quot;great&quot;  &quot;health&quot;    &quot;ruston&quot; &quot;see&quot;       &quot;click&quot;      &quot;pumpkin&quot;
+## [10,] &quot;fit&quot;    &quot;portland&quot;  &quot;friend&quot; &quot;today&quot;     &quot;sale&quot;       &quot;time&quot;
+##       Topic 7      Topic 8     Topic 9  Topic 10
+##  [1,] &quot;rain&quot;       &quot;transport&quot; &quot;near&quot;   &quot;list&quot;
+##  [2,] &quot;mph&quot;        &quot;spokan&quot;    &quot;collis&quot; &quot;amp&quot;
+##  [3,] &quot;wind&quot;       &quot;driver&quot;    &quot;clear&quot;  &quot;love&quot;
+##  [4,] &quot;humid&quot;      &quot;ave&quot;       &quot;vehicl&quot; &quot;look&quot;
+##  [5,] &quot;pressur&quot;    &quot;cdl&quot;       &quot;bridg&quot;  &quot;get&quot;
 ##  [6,] &quot;weather&quot;    &quot;class&quot;     &quot;home&quot;   &quot;vancouv&quot;
-##  [7,] &quot;light&quot;      &quot;bank&quot;      &quot;street&quot; &quot;night&quot;  
-##  [8,] &quot;cloud&quot;      &quot;zone&quot;      &quot;river&quot;  &quot;show&quot;   
-##  [9,] &quot;temperatur&quot; &quot;owner&quot;     &quot;decor&quot;  &quot;higher&quot; 
+##  [7,] &quot;light&quot;      &quot;bank&quot;      &quot;street&quot; &quot;night&quot;
+##  [8,] &quot;cloud&quot;      &quot;zone&quot;      &quot;river&quot;  &quot;show&quot;
+##  [9,] &quot;temperatur&quot; &quot;owner&quot;     &quot;decor&quot;  &quot;higher&quot;
 ## [10,] &quot;moder&quot;      &quot;see&quot;       &quot;lane&quot;   &quot;last&quot;</code></pre>
 <pre class="r"><code>#Texas Cities
 terms(texas.cities.topic.model, 10)[,1:10]</code></pre>
-<pre><code>##       Topic 1           Topic 2 Topic 3   Topic 4   Topic 5   Topic 6     
-##  [1,] &quot;austin&quot;          &quot;love&quot;  &quot;houston&quot; &quot;time&quot;    &quot;back&quot;    &quot;job&quot;       
-##  [2,] &quot;texa&quot;            &quot;like&quot;  &quot;fair&quot;    &quot;love&quot;    &quot;stop&quot;    &quot;hire&quot;      
-##  [3,] &quot;houston&quot;         &quot;get&quot;   &quot;state&quot;   &quot;san&quot;     &quot;traffic&quot; &quot;latest&quot;    
+<pre><code>##       Topic 1           Topic 2 Topic 3   Topic 4   Topic 5   Topic 6
+##  [1,] &quot;austin&quot;          &quot;love&quot;  &quot;houston&quot; &quot;time&quot;    &quot;back&quot;    &quot;job&quot;
+##  [2,] &quot;texa&quot;            &quot;like&quot;  &quot;fair&quot;    &quot;love&quot;    &quot;stop&quot;    &quot;hire&quot;
+##  [3,] &quot;houston&quot;         &quot;get&quot;   &quot;state&quot;   &quot;san&quot;     &quot;traffic&quot; &quot;latest&quot;
 ##  [4,] &quot;day&quot;             &quot;amp&quot;   &quot;texa&quot;    &quot;antonio&quot; &quot;delay&quot;   &quot;sanantonio&quot;
-##  [5,] &quot;amp&quot;             &quot;just&quot;  &quot;bed&quot;     &quot;amp&quot;     &quot;lane&quot;    &quot;click&quot;     
-##  [6,] &quot;atxtrafficaccid&quot; &quot;got&quot;   &quot;bath&quot;    &quot;today&quot;   &quot;block&quot;   &quot;austin&quot;    
-##  [7,] &quot;sunday&quot;          &quot;can&quot;   &quot;amp&quot;     &quot;thank&quot;   &quot;min&quot;     &quot;open&quot;      
-##  [8,] &quot;night&quot;           &quot;day&quot;   &quot;art&quot;     &quot;beauti&quot;  &quot;dalla&quot;   &quot;work&quot;      
+##  [5,] &quot;amp&quot;             &quot;just&quot;  &quot;bed&quot;     &quot;amp&quot;     &quot;lane&quot;    &quot;click&quot;
+##  [6,] &quot;atxtrafficaccid&quot; &quot;got&quot;   &quot;bath&quot;    &quot;today&quot;   &quot;block&quot;   &quot;austin&quot;
+##  [7,] &quot;sunday&quot;          &quot;can&quot;   &quot;amp&quot;     &quot;thank&quot;   &quot;min&quot;     &quot;open&quot;
+##  [8,] &quot;night&quot;           &quot;day&quot;   &quot;art&quot;     &quot;beauti&quot;  &quot;dalla&quot;   &quot;work&quot;
 ##  [9,] &quot;txi&quot;             &quot;don&quot;   &quot;live&quot;    &quot;great&quot;   &quot;right&quot;   &quot;careerarcw&quot;
-## [10,] &quot;new&quot;             &quot;good&quot;  &quot;day&quot;     &quot;happi&quot;   &quot;fwi&quot;     &quot;retail&quot;    
-##       Topic 7 Topic 8   Topic 9   Topic 10 
-##  [1,] &quot;post&quot;  &quot;dalla&quot;   &quot;now&quot;     &quot;job&quot;    
+## [10,] &quot;new&quot;             &quot;good&quot;  &quot;day&quot;     &quot;happi&quot;   &quot;fwi&quot;     &quot;retail&quot;
+##       Topic 7 Topic 8   Topic 9   Topic 10
+##  [1,] &quot;post&quot;  &quot;dalla&quot;   &quot;now&quot;     &quot;job&quot;
 ##  [2,] &quot;photo&quot; &quot;txi&quot;     &quot;antonio&quot; &quot;houston&quot;
-##  [3,] &quot;just&quot;  &quot;worth&quot;   &quot;san&quot;     &quot;hire&quot;   
-##  [4,] &quot;get&quot;   &quot;trend&quot;   &quot;south&quot;   &quot;latest&quot; 
-##  [5,] &quot;can&quot;   &quot;mph&quot;     &quot;mph&quot;     &quot;nurs&quot;   
-##  [6,] &quot;like&quot;  &quot;houston&quot; &quot;trend&quot;   &quot;work&quot;   
-##  [7,] &quot;don&quot;   &quot;wind&quot;    &quot;live&quot;    &quot;click&quot;  
-##  [8,] &quot;amp&quot;   &quot;humid&quot;   &quot;trump&quot;   &quot;open&quot;   
-##  [9,] &quot;new&quot;   &quot;texa&quot;    &quot;right&quot;   &quot;texa&quot;   
+##  [3,] &quot;just&quot;  &quot;worth&quot;   &quot;san&quot;     &quot;hire&quot;
+##  [4,] &quot;get&quot;   &quot;trend&quot;   &quot;south&quot;   &quot;latest&quot;
+##  [5,] &quot;can&quot;   &quot;mph&quot;     &quot;mph&quot;     &quot;nurs&quot;
+##  [6,] &quot;like&quot;  &quot;houston&quot; &quot;trend&quot;   &quot;work&quot;
+##  [7,] &quot;don&quot;   &quot;wind&quot;    &quot;live&quot;    &quot;click&quot;
+##  [8,] &quot;amp&quot;   &quot;humid&quot;   &quot;trump&quot;   &quot;open&quot;
+##  [9,] &quot;new&quot;   &quot;texa&quot;    &quot;right&quot;   &quot;texa&quot;
 ## [10,] &quot;want&quot;  &quot;texan&quot;   &quot;houston&quot; &quot;great&quot;</code></pre>
 
 
