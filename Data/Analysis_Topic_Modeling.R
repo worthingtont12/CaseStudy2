@@ -94,3 +94,48 @@ texas.other.text.clean = tm_map(texas.other.text.clean, content_transformer(tolo
 texas.other.text.clean = tm_map(texas.other.text.clean, removeWords, stopwords("english"))  # remove stop words
 texas.other.text.clean = tm_map(texas.other.text.clean, stemDocument, lazy = TRUE)          # stem all words
 texas.other.text.clean.tf = DocumentTermMatrix(texas.other.text.clean, control = list(weighting = weightTf))
+
+
+
+
+###############################
+
+
+austin_text <- paste(austin$author.text, collapse = ' ')
+seattle_text <- paste(seattle$author.text, collapse = ' ')
+dallas_text <- paste(dallas$author.text, collapse = ' ')
+houston_text <- paste(houston$author.text, collapse = ' ')
+texas.other_text <- paste(texas.other$author.text, collapse = ' ')
+washington.other_text <- paste(washington.other$author.text, collapse = ' ')
+
+text.df <- as.data.frame(c(seattle_text, washington.other_text, austin_text, dallas_text, houston_text, texas.other_text))
+
+text.df = VCorpus(DataframeSource(text.df))
+text.clean = tm_map(text.df, stripWhitespace)                          # remove extra whitespace
+text.clean = tm_map(text.clean, removeNumbers)                      # remove numbers
+text.clean = tm_map(text.clean, removePunctuation)                  # remove punctuation
+text.clean = tm_map(text.clean, content_transformer(tolower))       # ignore case
+text.clean = tm_map(text.clean, removeWords, stopwords("english"))  # remove stop words
+text.clean = tm_map(text.clean, stemDocument)                       # stem all words
+
+text.clean.tfidf = DocumentTermMatrix(text.clean, control = list(weighting = weightTfIdf))
+doc.tfidf = t(inspect(text.clean.tfidf[]))
+
+seattle.ss <- sum((doc.tfidf[,1])^2)
+washington.other.ss <- sum((doc.tfidf[,2])^2)
+austin.ss <- sum((doc.tfidf[,3])^2)
+dallas.ss <- sum((doc.tfidf[,4])^2)
+houston.ss <- sum((doc.tfidf[,5])^2)
+texas.other.ss <- sum((doc.tfidf[,6])^2)
+
+seattle.vs.washington <- sum(doc.tfidf[,1]*doc.tfidf[,2])
+seattle.vs.washington / sqrt((seattle.ss)*(washington.other.ss))
+
+seattle.vs.austin <- sum(doc.tfidf[,1]*doc.tfidf[,3])
+seattle.vs.austin / sqrt((seattle.ss)*(austin.ss))
+
+seattle.vs.houston <- sum(doc.tfidf[,1]*doc.tfidf[,5])
+seattle.vs.houston / sqrt((seattle.ss)*(houston.ss))
+
+houston.vs.austin <- sum(doc.tfidf[,5]*doc.tfidf[,3])
+houston.vs.austin / sqrt((houston.ss)*(austin.ss))
