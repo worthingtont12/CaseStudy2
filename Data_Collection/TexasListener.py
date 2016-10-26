@@ -46,7 +46,6 @@ class listener(StreamListener):
                 print('Below is the printed exception')
                 print(e)
                 if '401' in e:
-                    # not sure if this will even work
                     print('Below is the response that came in')
                     print(e)
                     time.sleep(60)
