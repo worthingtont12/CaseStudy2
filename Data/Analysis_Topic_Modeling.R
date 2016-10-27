@@ -1,5 +1,6 @@
 washington <- read.csv('Washington_cleaned.csv')
 texas <- read.csv('Texas_cleaned.csv')
+#Variable Subsetting
 texas <- texas[-2]
 texas <- texas[-3]
 texas <- texas[-3]
@@ -15,18 +16,19 @@ washington <- washington[-6]
 washington <- washington[-1]
 washington <- unique(washington)
 
+#Defining Locations
 seattle <- washington[grepl('seattle', washington$user.location, ignore.case = TRUE),]
-washington.other <- washington[!grepl('seattle', washington$user.location, ignore.case = TRUE) & 
-                             (grepl('WA', washington$user.location) | 
+washington.other <- washington[!grepl('seattle', washington$user.location, ignore.case = TRUE) &
+                             (grepl('WA', washington$user.location) |
                                 grepl('washington', washington$user.location, ignore.case = TRUE)), ]
 
 austin <- texas[grepl('austin', texas$user.location, ignore.case = TRUE),]
 dallas <- texas[grepl('dallas', texas$user.location, ignore.case = TRUE),]
 houston <- texas[grepl('houston', texas$user.location, ignore.case = TRUE),]
-texas.other <- texas[! (grepl('austin', texas$user.location, ignore.case = TRUE) | 
-                          grepl('dallas', texas$user.location, ignore.case = TRUE) | 
-                          grepl('houston', texas$user.location, ignore.case = TRUE)) & 
-                       (grepl('TX', texas$user.location) | 
+texas.other <- texas[! (grepl('austin', texas$user.location, ignore.case = TRUE) |
+                          grepl('dallas', texas$user.location, ignore.case = TRUE) |
+                          grepl('houston', texas$user.location, ignore.case = TRUE)) &
+                       (grepl('TX', texas$user.location) |
                           grepl('texas', texas$user.location, ignore.case = TRUE)), ]
 
 
@@ -95,10 +97,29 @@ texas.other.text.clean = tm_map(texas.other.text.clean, removeWords, stopwords("
 texas.other.text.clean = tm_map(texas.other.text.clean, stemDocument, lazy = TRUE)          # stem all words
 texas.other.text.clean.tf = DocumentTermMatrix(texas.other.text.clean, control = list(weighting = weightTf))
 
-
+# train topic model with 10 topics
+#Austin
+austin.topic.model = LDA(austin.text.clean.tf, 10)
+#Dallas
+dallas.topic.model = LDA(dallas.text.clean.tf, 10)
+#Houston
+houston.topic.model = LDA(austin.text.clean.tf, 10)
+#San Antonio
+sanantonio.topic.model = LDA(san.text.clean.tf, 10)
+#Texas
+row.sums = apply(texas.other.text.clean.tf, 1, sum)
+texas.other.text.clean.tf = texas.other.text.clean.tf[row.sums > 0,]
+texas.topic.model = LDA(texas.other.text.clean.tf, 10)
+#Seattle
+seattle.topic.model = LDA(seattle.text.clean.tf, 10)
+#Washington State
+washington.topic.model = LDA(washington.other.text.clean.tf, 10)
+#Texas Cities
+texas.cities.topic.model = LDA(tex.cities.clean.tf, 10)
 
 
 ###############################
+#Cosign Similarity
 
 
 austin_text <- paste(austin$author.text, collapse = ' ')
