@@ -1,4 +1,4 @@
-#import re
+"""Used to check on progess during collection phase"""
 from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
 db = client['Texas_tweets']
