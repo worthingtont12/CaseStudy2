@@ -15,7 +15,11 @@ originates (collectively) from the remainder of Washington state.
 
 # Approach
 
-We used topic modeling to identify the most common "conversational themes" in four urban areas (Seattle, Dallas,Austin and Houston) and two less urban areas (the remainder of Washington state and the remainder of Texas). We further compared Twitter content in these regions using the measure of cosine similarity. The topic models revealed mixed results, while cosine similarity values suggest that regions are more closely linked to nearby regions than regions with a similar urban or non-urban makeup, at least in terms of their Twitter users' topics of interest. While Twitter content only serves as one index of cultural similarity or dissimilarity, this index revealed significant semantic differences by region.
+We used topic modeling to identify the most common "conversational themes" in four urban areas (Seattle, Dallas,Austin and Houston) and two less urban areas (the remainder of Washington state and the remainder of Texas). We further compared Twitter content in these regions using the measure of cosine similarity. 
+
+#Results
+
+The topic models revealed mixed results, while cosine similarity values suggest that regions are more closely linked to nearby regions than regions with a similar urban or non-urban makeup, at least in terms of their Twitter users' topics of interest. While Twitter content only serves as one index of cultural similarity or dissimilarity, this index revealed significant semantic differences by region.
 
 # Reason for Project
 
