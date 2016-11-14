@@ -4,7 +4,7 @@ We are comparing cities in Texas and Washington and seeing if we can identify cu
 
 # Data
 
-The data set used to test for this project includes tweets issued sporadically by Twitter users residing in the states of Washington and Texas from October 16 to October 25, 2016\. In total, we collected over 80,964 tweets that were posted over this time period and tagged with geographic coordinates within the bounds of Washington and Texas.
+The data set used for this project includes tweets issued sporadically by Twitter users residing in the states of Washington and Texas from October 16 to October 25, 2016\. In total, we collected over 80,964 tweets that were posted over this time period and tagged with geographic coordinates within the bounds of Washington and Texas.
 
 #Hypothesis
 
